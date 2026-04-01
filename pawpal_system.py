@@ -12,6 +12,11 @@ class Task:
     duration_minutes: int
     priority: str          # "low" | "medium" | "high"
     description: str = ""
+    status: str = "pending"  # "pending" | "complete"
+
+    def mark_complete(self) -> None:
+        """Mark this task as complete."""
+        self.status = "complete"
 
     def priority_rank(self) -> int:
         """Return a numeric rank so tasks can be sorted (higher = more urgent)."""
@@ -24,6 +29,11 @@ class Pet:
     species: str           # "dog" | "cat" | "other"
     age: int = 0
     special_needs: list[str] = field(default_factory=list)
+    tasks: list[Task] = field(default_factory=list)
+
+    def add_task(self, task: Task) -> None:
+        """Add a task to this pet's task list."""
+        self.tasks.append(task)
 
     def get_default_tasks(self) -> list[Task]:
         """Return a species-appropriate list of default tasks."""
