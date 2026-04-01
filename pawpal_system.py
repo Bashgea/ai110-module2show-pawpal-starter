@@ -165,7 +165,7 @@ class Schedule:
                 f"  [{entry.task.priority} priority]"
             )
             if entry.reason:
-                lines.append(f"    → {entry.reason}")
+                lines.append(f"    -> {entry.reason}")
 
         return "\n".join(lines)
 
