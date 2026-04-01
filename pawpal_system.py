@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 
 
 # ---------------------------------------------------------------------------
@@ -14,7 +15,7 @@ class Task:
 
     def priority_rank(self) -> int:
         """Return a numeric rank so tasks can be sorted (higher = more urgent)."""
-        return {"low": 1, "medium": 2, "high": 3}.get(self.priority, 0)
+        pass
 
 
 @dataclass
@@ -33,7 +34,7 @@ class Pet:
 class Owner:
     name: str
     available_minutes: int
-    preferred_start_time: str = "08:00"  # 24-hour format
+    preferred_start_time: str = "08:00"  # 24-hour HH:MM, set by the owner
 
 
 # ---------------------------------------------------------------------------
@@ -49,7 +50,9 @@ class ScheduledEntry:
 
 
 class Schedule:
-    def __init__(self):
+    def __init__(self, owner: Owner, pet: Pet):
+        self.owner = owner
+        self.pet = pet
         self.entries: list[ScheduledEntry] = []
         self.total_duration: int = 0
 
@@ -57,7 +60,7 @@ class Schedule:
         """Append a ScheduledEntry and update total_duration."""
         pass
 
-    def is_feasible(self, owner: Owner) -> bool:
+    def is_feasible(self) -> bool:
         """Return True if total_duration fits within owner's available_minutes."""
         pass
 
@@ -77,5 +80,6 @@ class Scheduler:
         self.tasks = tasks
 
     def build(self) -> Schedule:
-        """Sort tasks by priority, fit them into available time, return a Schedule."""
+        """Merge pet defaults into task list, sort by priority, fit tasks into
+        the owner's available time window, and return a Schedule."""
         pass

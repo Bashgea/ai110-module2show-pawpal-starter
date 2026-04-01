@@ -32,10 +32,12 @@ classDiagram
     }
 
     class Schedule {
+        +Owner owner
+        +Pet pet
         +List~ScheduledEntry~ entries
         +int total_duration
         +add_entry(entry)
-        +is_feasible(owner) bool
+        +is_feasible() bool
         +explain() String
     }
 
@@ -51,6 +53,8 @@ classDiagram
     Pet "1" --> "*" Task : has default
     Scheduler "1" --> "*" Task : prioritizes
     Scheduler "1" --> "1" Schedule : produces
+    Schedule "1" --> "1" Owner : belongs to
+    Schedule "1" --> "1" Pet : belongs to
     Schedule "1" --> "*" ScheduledEntry : contains
     ScheduledEntry "1" --> "1" Task : wraps
 ```

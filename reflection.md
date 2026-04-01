@@ -4,13 +4,29 @@
 
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+The initial design has six classes organized into two layers: data classes and logic classes.
+
+**Data classes** (use Python `@dataclass` for clean attribute definitions):
+- `Task` — represents a single care activity. Holds `title`, `duration_minutes`, `priority`, and `description`. Responsible for knowing its own urgency via `priority_rank()`.
+- `Pet` — represents the animal being cared for. Holds `name`, `species`, `age`, and `special_needs`. Responsible for providing species-appropriate default tasks via `get_default_tasks()`.
+- `Owner` — represents the person managing care. Holds `name`, `available_minutes` (daily time budget), and `preferred_start_time`. No behavior — purely a data container passed to the scheduler.
+- `ScheduledEntry` — a thin wrapper that pairs a `Task` with a computed `start_time`, `end_time`, and a `reason` string explaining why it was included. Exists so the timeline is explicit rather than stored as raw tuples.
+
+**Logic classes:**
+- `Schedule` — the output of the planning process. Owns an ordered list of `ScheduledEntry` objects and tracks `total_duration`. Responsible for checking feasibility against the owner's time budget and producing a human-readable explanation of the plan.
+- `Scheduler` — the planning engine. Takes an `Owner`, a `Pet`, and a list of candidate `Task`s, then produces a `Schedule` via `build()`. Responsible for sorting by priority and fitting tasks within the available time window.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+Yes, four changes were made after reviewing the initial design for missing relationships and logic bottlenecks:
+
+1. **`Schedule` now owns `Owner` and `Pet`.** The original design passed `owner` as an argument to `is_feasible(owner)` and had no reference to `Pet`. Storing both at construction time makes `Schedule` self-contained — `is_feasible()` needs no arguments, and `explain()` can produce context like "Jordan's plan for Mochi" without any extra input.
+
+2. **`Scheduler.build()` merges `pet.get_default_tasks()` internally.** The initial design left no clear path for pet defaults to enter the schedule. Moving the merge into `build()` keeps `app.py` simple — the caller only supplies manually-added tasks and the scheduler handles defaults transparently.
+
+3. **Time arithmetic uses `datetime` internally.** `start_time` and `end_time` are stored as display strings (`"08:00"`), but computing them requires real arithmetic. `build()` now works with `datetime` objects and converts to strings only at the point of creating a `ScheduledEntry`, avoiding string-manipulation bugs at the time boundary.
+
+4. **Budget is checked inside `build()` before each entry is added.** The original structure would have allowed `build()` to produce an over-budget `Schedule` and only detect it afterward via `is_feasible()`. The revised approach skips any task that exceeds remaining time, so the returned `Schedule` is always feasible by construction.
 
 ---
 
