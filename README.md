@@ -22,6 +22,33 @@ Your final app should:
 - Display the plan clearly (and ideally explain the reasoning)
 - Include tests for the most important scheduling behaviors
 
+## Smarter Scheduling
+
+PawPal+ goes beyond a basic task list with four intelligent scheduling features:
+
+**Priority-aware sorting (Algorithm A)**
+Tasks are ordered by urgency first (high → medium → low), with shortest-duration
+tasks scheduled first within the same priority level. This ensures critical care
+(medications, feeding) always runs before optional enrichment activities.
+
+**Status filtering**
+Tasks already marked complete via `Task.mark_complete()` are automatically excluded
+from the next scheduling run. Calling `Schedule.filter_by_status("pending")` returns
+only the tasks still remaining in a given day's plan.
+
+**Recurring tasks**
+Tasks with `frequency="daily"` or `frequency="weekly"` reset themselves to `"pending"`
+on completion and advance their `next_due` date by the appropriate interval using
+Python's `timedelta`. This means daily medications and weekly grooming sessions
+reappear automatically without manual re-entry.
+
+**Conflict detection**
+`ConflictDetector` provides two checks:
+- `check()` — warns when the combined duration of all pets' schedules exceeds the
+  owner's available minutes (budget overrun).
+- `detect_overlaps()` — warns when any two scheduled entries share overlapping time
+  windows, catching double-bookings across pets that share the same owner.
+
 ## Getting started
 
 ### Setup

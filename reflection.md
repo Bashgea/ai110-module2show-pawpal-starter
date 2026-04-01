@@ -39,8 +39,11 @@ Yes, four changes were made after reviewing the initial design for missing relat
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+The scheduler skips any task whose `duration_minutes` exceeds the remaining time budget rather than attempting to fit shorter tasks around it. For example, if 15 minutes remain and the next high-priority task takes 20 minutes, that task is dropped entirely — even if a 10-minute medium-priority task could still fit in the gap.
+
+This is a greedy approach: it processes tasks in sorted order and makes a permanent skip decision without backtracking. A more optimal algorithm (e.g., a knapsack-style search) could fill that 15-minute gap with the best-fitting lower-priority task, producing a fuller schedule.
+
+The tradeoff is reasonable here because pet care tasks have a strict urgency ordering — it would be wrong to schedule a grooming session in the slot where a vet medication was skipped just because grooming is shorter. Simplicity and predictability ("high-priority tasks are always attempted first, in full") matter more than packing every minute, and the approach runs in O(n log n) time regardless of task count.
 
 ---
 
